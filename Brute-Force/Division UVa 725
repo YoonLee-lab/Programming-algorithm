@@ -1,4 +1,4 @@
-注意何时sign数组清0，注意no_confict嵌套，注意其中一个值超过5位数时也属于越界。
+注意何时sign数组清0，注意no_confict嵌套，注意两个位数和为10位但其中一个值超过5位数时也属于越界。
 使用了sign[10]数组，如果某一个数字i已经出现，则sign[i] = 1
 #include <cstdio>
 #include <cstring>
