@@ -1,0 +1,24 @@
+数字三角形问题：
+通过记忆化搜索，将已算出的值进行存储，通过判断是否已有值，大大减少重复计算次数。
+关键在于 状态定义
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 15;
+int d[maxn][maxn], dp[maxn][maxn]; // store the biggest sum from dp[i][j]
+int N;
+int solve(int i, int j) {
+    if(dp[i][j] >= 0) return dp[i][j];
+    return dp[i][j] = d[i][j] + (i == N ? 0 : max(solve(i+1, j), solve(i+1, j+1)));
+}
+int main() {
+    while(scanf("%d", &N) != EOF && N != 0) {
+        for(int i = 1; i <= N; i++)
+            for(int j = 1; j <= i; j++)
+                scanf("%d", &d[i][j]);
+        memset(dp, -1, sizeof(dp));
+        printf("%d\n", solve(1,1));
+    }
+    return 0;
+}
