@@ -1,4 +1,4 @@
-注意何时sign数组清0，注意no_confict嵌套。
+注意何时sign数组清0，注意no_confict嵌套，注意其中一个值超过5位数时也属于越界。
 使用了sign[10]数组，如果某一个数字i已经出现，则sign[i] = 1
 #include <cstdio>
 #include <cstring>
@@ -14,6 +14,7 @@ bool over_boundary(int a, int b) {
 	la = count_num(a);
 	lb = count_num(b);
 	if(la + lb > 10) return true; // step over the boundary
+	else if(la > 5 || lb > 5) return true;
 	return false; // in the boundary
 }
 bool no_confict(int n) {
@@ -31,8 +32,11 @@ bool no_confict(int n) {
 }
 int main() {
 	int abcde;
-	int N;
-	while(scanf("%d", &N) != EOF && N != 0) {		
+	int N, first = 1;
+	while(scanf("%d", &N) != EOF && N != 0) {
+		if(!first) {
+			printf("\n");
+		}else first = 0;
 		int ok = 0;
 		for(int i = 1266; i < 99999; i++) {
 			memset(sign, 0, sizeof(sign));
@@ -44,8 +48,7 @@ int main() {
 					ok = 1;
 				}
 		}
-		if(!ok) printf("There are no solutions for %d.\n\n", N);
-		else printf("\n");
+		if(!ok) printf("There are no solutions for %d.\n", N);
 	}
 	return 0;
 }
