@@ -1,0 +1,51 @@
+注意何时sign数组清0，注意no_confict嵌套。
+使用了sign[10]数组，如果某一个数字i已经出现，则sign[i] = 1
+#include <cstdio>
+#include <cstring>
+const int maxn = 10;
+int sign[10];
+int count_num(int n) {
+	int ln = 1;
+	while((n /= 10) > 0) ln++;
+	return ln;
+}
+bool over_boundary(int a, int b) {
+	int la = 0, lb = 0;
+	la = count_num(a);
+	lb = count_num(b);
+	if(la + lb > 10) return true; // step over the boundary
+	return false; // in the boundary
+}
+bool no_confict(int n) {
+	if(!sign[n%10]) sign[n%10] = 1;
+	else return false;
+	if(!sign[n/10%10]) sign[n/10%10] = 1;
+	else return false;
+	if(!sign[n/100%10]) sign[n/100%10] = 1;
+	else return false;
+	if(!sign[n/1000%10]) sign[n/1000%10] = 1;
+	else return false;
+	if(!sign[n/10000%10]) sign[n/10000%10] = 1;
+	else return false;
+	return true;
+}
+int main() {
+	int abcde;
+	int N;
+	while(scanf("%d", &N) != EOF && N != 0) {		
+		int ok = 0;
+		for(int i = 1266; i < 99999; i++) {
+			memset(sign, 0, sizeof(sign));
+			abcde = N * i;
+			if(over_boundary(abcde, i)) break;
+			if(no_confict(i))
+				if(no_confict(abcde)) {
+					printf("%d / %05d = %d\n", abcde, i, N);
+					ok = 1;
+				}
+		}
+		if(!ok) printf("There are no solutions for %d.\n\n", N);
+		else printf("\n");
+	}
+	return 0;
+}
