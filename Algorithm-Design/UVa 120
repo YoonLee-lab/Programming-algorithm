@@ -1,0 +1,56 @@
+构造法实施的例子：循环：每次先将最大的移到顶部，然后再翻转到底部即可。
+用到了C++中的stringstream这一方法，即使不知道有多少输入值，也可以得到所有输入。
+
+#include <cstdio>
+#include <sstream>
+#include <iostream>
+#include <string>
+using namespace std;
+const int maxn = 30 + 5;
+int pan[maxn];
+int N;
+void exchange(int a, int b) { // exchange two pancakes
+    int t = pan[a];
+    pan[a] = pan[b];
+    pan[b] = t;
+}
+int find_max(int n) { // find position of max pan above i, return index
+    int m = pan[n], ind = n;
+    for(int i = 0; i < n; i++)
+        if(m < pan[i]) {
+            m = pan[i];
+            ind = i;
+        }
+    return ind;
+}
+void operation(int n) { // flap all pans above #n
+    for(int i = 0; i <= n/2; i++)
+        exchange(i, n-i);
+}
+int main() {
+    string line;
+    while(getline(cin, line)) {
+        N = 0;
+        stringstream ss(line);
+        while(ss >> pan[N]) {
+            printf("%d ", pan[N]);
+            N++;
+        }
+        printf("\n");
+        int cur = N-1;
+        while(cur > -1) {
+            int i = find_max(cur);
+            if(i != cur) {
+                if(i != 0) {
+                    operation(i);
+                    printf("%d ", N-i);
+                }
+                operation(cur);
+                printf("%d ", N-cur);
+            }
+            cur--;
+        }
+        printf("0\n");
+    }
+    return 0;
+}
