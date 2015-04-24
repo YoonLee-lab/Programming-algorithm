@@ -1,5 +1,29 @@
 注意何时sign数组清0，注意no_confict嵌套，注意两个位数和为10位但其中一个值超过5位数时也属于越界。
 使用了sign[10]数组，如果某一个数字i已经出现，则sign[i] = 1
+
+int used[10];
+
+int judge( int a, int b )
+{
+	if ( b > 98765 ) return 0;
+	for ( int i = 0 ; i < 10 ; ++ i )
+		used[i] = 0;
+	if ( a < 10000 ) used[0] = 1;
+	while ( a ) {
+		used[a%10] = 1;
+		a /= 10;
+	}
+	while ( b ) {
+		used[b%10] = 1;
+		b /= 10;
+	}
+	int sum = 0;
+	for ( int i = 0 ; i < 10 ; ++ i )
+		sum += used[i];
+	return (sum == 10);
+}
+
+这种判断要简洁得多
 #include <cstdio>
 #include <cstring>
 const int maxn = 10;
@@ -38,7 +62,7 @@ int main() {
 			printf("\n");
 		}else first = 0;
 		int ok = 0;
-		for(int i = 1266; i < 99999; i++) {
+		for(int i = 1234; i < 99999; i++) {
 			memset(sign, 0, sizeof(sign));
 			abcde = N * i;
 			if(over_boundary(abcde, i)) break;
