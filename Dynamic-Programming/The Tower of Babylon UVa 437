@@ -1,0 +1,52 @@
+求最长子序列问题，转化为DAG模型。
+注意：一个长方体有6种不同的长宽组合，对待这些时应作为不同的长方体对待，不重不漏，d[i]代表以第i个长方体结尾的最高值。
+比较时可先按宽依次递增将长方体排序，然后比较长来构建DAG模型。
+#include <cstdio>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+const int maxn = 200;
+struct pile{
+    int a, b, c;
+    void f(int x, int y, int z) {
+        a = x; b = y; c = z;
+    }
+}p[maxn];
+//int G[maxn][3][maxn][3]; // p(idx,k) as state
+int G[maxn][maxn];
+long long d[maxn];
+bool cmp(pile a, pile b) {
+    return a.b < b.b;
+}
+int main() {
+    int N, x, y, z, cnt = 0;
+    while(scanf("%d", &N) != EOF && N) {
+        memset(G, 0, sizeof(G));
+        int m = 0;
+        for(int i = 0; i < N; i++) {
+            scanf("%d%d%d", &x, &y, &z);
+            p[m++].f(x, y, z);
+            p[m++].f(x, z, y);
+            p[m++].f(y, x, z);
+            p[m++].f(y, z, x);
+            p[m++].f(z, x, y);
+            p[m++].f(z, y, x);
+        }
+        sort(p, p+m, cmp);
+        // construct a graph
+        for(int i = 0; i < m; i++) // 此时有m个长方体，非N个
+            for(int j = 0; j < i; j++)
+                if(p[j].a < p[i].a && p[j].b < p[i].b)
+                    G[j][i] = 1;
+        // dp
+        long long t = 0;
+        for(int i = 0; i < m; i++) {
+            d[i] = p[i].c;
+            for(int j = 0; j < i; j++)
+                if(G[j][i]) d[i] = max(d[i], d[j] + p[i].c);
+            if(t < d[i]) t = d[i];
+        }
+        printf("Case %d: maximum height = %lld\n", ++cnt, t);
+    }
+    return 0;
+}
