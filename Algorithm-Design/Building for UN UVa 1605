@@ -1,0 +1,21 @@
+根据题目要求，书中给出一个方法，2层，每层n*n个格子，第一层第i行全是国家i，第二层第j列全是国家j，可满足题目要求
+#include <cstdio>
+int main() {
+	int N;
+	while(scanf("%d", &N) != EOF) {
+		printf("%d %d %d\n", 2, N, N);
+		for(int i = 0; i < N; i++) {
+			for(int j = 0; j < N; j++)
+				printf("%c", i<26 ? i+'A' : i+6+'A');
+			printf("\n");
+		}
+		printf("\n");
+		for(int j = 0; j < N; j++) {
+			for(int i = 0; i < N; i++)
+				printf("%c", i<26 ? i+'A' : i+6+'A');
+			printf("\n");
+		}
+		printf("\n");
+	}
+	return 0;
+}
