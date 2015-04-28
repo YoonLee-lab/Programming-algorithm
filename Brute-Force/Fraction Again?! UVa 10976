@@ -1,0 +1,63 @@
+根据题目要求，可以找到y <= 2k，y的循环从k+1到2k枚举
+正确做法： 化简有如下关系：(y-k)x = ky，利用该关系判断。
+#include <algorithm>
+#include <iostream>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cmath>
+
+using namespace std;
+
+int a[10011];
+int b[10011];
+
+int main()
+{
+	int n;
+	while (~scanf("%d",&n)) {
+		int m = n<<1,count = 0;
+		for (int i = n+1 ; i <= m ; ++ i) {
+			if (i*n % (i-n) == 0) {
+				a[count] = i*n/(i-n);
+				b[count] = i;
+				count ++;
+			}
+		}
+		
+		printf("%d\n",count);
+		for (int i = 0 ; i < count ; ++ i)
+			printf("1/%d = 1/%d + 1/%d\n",n,a[i],b[i]);
+	}
+    return 0;
+}
+
+错误做法（我的）：利用浮点数比较。通常认为两个浮点数相差在1e-6以内即为相等，但是对于本题k=10000时，则会太过宽松，出现很多错误估算，需要多次尝试，最终定在1e-16比较准确，如果为1e-15，会出现以下错误：1/10000 = 1/33343334 + 1/10003，因此对于涉及大的浮点数除法运算时，尽量发掘更深层的规律较为方便。
+注意：浮点型向整型强制类型转换时向下取整，因此加上一个小数保证正确。
+abs()整型取绝对值，如果浮点型取绝对值应用fabs()。
+#include <cstdio>
+#include <cmath>
+using namespace std;
+const int maxn = 10000 + 10;
+int xy[maxn][2];
+int main() {
+	int k, x, y, cnt;
+	while(scanf("%d", &k) != EOF) {
+		cnt = 0;
+		double inv_k = 1.0/k;
+		for(y = k+1; y <= 2*k; y++) {
+			double inv_y = 1.0/y;
+			x = 1.0/(inv_k - inv_y) + 0.9;
+			//printf("%d  %lf  %lf  %lf  %lf\n", x, inv_k, inv_y, (double)1.0/x, inv_k - inv_y);
+			if(fabs(1.0/x - (inv_k - inv_y)) <= 1e-15) { ///易出错点
+				xy[cnt][0] = x;
+				xy[cnt][1] = y;
+				cnt++;
+			}
+		}
+		printf("%d\n", cnt);
+		for(int i = 0; i < cnt; i++)
+			printf("1/%d = 1/%d + 1/%d\n", k, xy[i][0], xy[i][1]);
+	}
+	return 0;
+}
