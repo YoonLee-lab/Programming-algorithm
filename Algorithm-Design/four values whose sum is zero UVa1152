@@ -1,0 +1,96 @@
+以下是个人解决方案，使用哈希表存储a+b的值，哈希函数使用取模（模通常为比较大的素数，防止太多冲突）运算，由于有的和可能为负，因此使用((key%MOD) + MOD) % MOD计算，保证全为正数，使用链地址法存储哈希表。
+枚举所有哈希表中的值，枚举C中的一个，找D中有多少个与要求的值相等，d=-a-b-c，即为个数。
+但这种方法运算超时，因此改进时需要将c+d也用哈希表存储，然后两个哈希表进行比较。
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+const int maxn = 4000 + 10;
+const int MOD = 1e5 + 7;
+int N;
+int A[maxn], B[maxn], C[maxn], D[maxn];
+struct node {
+    int value;
+    node *next;
+}h_table[MOD]; // head
+
+node *new_node() {
+    node *a = new node;
+    a->next = NULL;
+    return a;
+}
+
+int h(int key) { // negative value in case
+    return ((key%MOD) + MOD) % MOD;
+}
+
+// lbound and ubound return [x1, x2) indicating position of v in D
+// including left and excluding right interval region
+int lbound(int *D, int x, int y, int v) {
+    int m;
+    while(x < y) {
+        m = x + (y-x)/2;
+        if(D[m] >= v) y = m;
+        else x = m + 1;
+    }
+    return x;
+}
+int ubound(int *D, int x, int y, int v) {
+    int m;
+    while(x < y) {
+        m = x + (y-x)/2;
+        if(D[m] <= v) x = m + 1;
+        else y = m;
+    }
+    return x;
+}
+
+int main() {
+    int T;
+    bool first = true;
+    scanf("%d", &T);
+    while(T--) {
+        scanf("%d", &N);
+        for(int i = 0; i < N; i++)
+            scanf("%d%d%d%d", &A[i], &B[i], &C[i], &D[i]);
+        for(int i = 0; i < N; i++) // establish hash table
+            for(int j = 0; j < N; j++) {
+                int t = A[i] + B[j];
+                node *s = new_node();
+                s->value = t;
+                if(!h_table[h(t)].next)
+                    h_table[h(t)].next = s;
+                else {
+                    node *p = h_table[h(t)].next;
+                    while(p->next) p = p->next;
+                    p->next = s;
+                }
+                //printf("%d  ", h(t));
+            }
+        //printf("\n");
+        // count
+        int cnt = 0;
+        sort(D, D+N);
+        for(int i = 0; i < MOD; i++) {
+            node *t = h_table[i].next;
+            while(t) {
+                for(int j = 0; j < N; j++) {
+                    int target = -t->value - C[j];
+                    int l = lbound(D, 0, N, target);
+                    int r = ubound(D, 0, N, target);
+                    if(r == l) continue;
+                    else {
+                        cnt += r-l;
+                        //printf("%d %d %d \n", t->value, C[j], D[l]);
+                    }
+                }
+                t = t->next;
+            }
+        }
+        if(first) {
+            printf("%d\n", cnt);
+            first = false;
+        }else
+            printf("\n%d\n", cnt);
+    }
+    return 0;
+}
