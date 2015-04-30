@@ -1,6 +1,6 @@
 （一）以下是个人解决方案，使用哈希表存储a+b的值，哈希函数使用取模（模通常为比较大的素数，防止太多冲突）运算，由于有的和可能为负，因此使用((key%MOD) + MOD) % MOD计算，保证全为正数，使用链地址法存储哈希表。
 枚举所有哈希表中的值，枚举C中的一个，找D中有多少个与要求的值相等，d=-a-b-c，即为个数。
-但这种方法运算超时，因此改进时需要将c+d也用哈希表存储，然后两个哈希表进行比较。
+但这种方法运算超时，因此改进时需要将c+d也用哈希表存储，然后两个哈希表进行比较。大于n*nlogn
 #include <cstdio>
 #include <algorithm>
 using namespace std;
@@ -95,7 +95,7 @@ int main() {
     return 0;
 }
 
-（二）
+（二）a+b和-c-d都用了hash_table存储，然后比对，好处是两种结果经过hash函数的运算，hash值相等，只需要寻找链表中存储的值相同即可，但是缺点这种方法太耗费时间，可能因为牵扯到内存申请和释放，结果是tle。经思考，可能使用静态的内存空间较好。n*nlogn
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
@@ -219,4 +219,36 @@ int main() {
     return 0;
 }
 
-（三）
+（三）这种方法没有用到hash表，开一个数组存储了a+b的结果，然后对这个数组排序，再枚举-c-d的结果，二分查找a+b有多少个与其相等的结果。
+注意：upper_bound找到目标值的下一个位置，lower_bound找到第一个目标值的位置，属于左闭右开区间，相减即可得到个数。n*nlogn
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 4000 + 10;
+int N;
+int A[maxn], B[maxn], C[maxn], D[maxn], AB[maxn*maxn];
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while(T--) {
+        scanf("%d", &N);
+        for(int i = 0; i < N; i++)
+            scanf("%d%d%d%d", &A[i], &B[i], &C[i], &D[i]);
+        int t = 0;
+        for(int i = 0; i < N; i++)
+            for(int j = 0; j < N; j++)
+                AB[t++] = A[i] + B[j];
+                
+        int cnt = 0;
+        sort(AB, AB+t);
+        for(int i = 0; i < N; i++)
+            for(int j = 0; j < N; j++)
+                cnt += upper_bound(AB, AB+t, -C[i]-D[j]) - lower_bound(AB, AB+t, -C[i]-D[j]);
+    
+        printf("%d\n", cnt);
+        if(T) printf("\n");
+    }
+    return 0;
+}
