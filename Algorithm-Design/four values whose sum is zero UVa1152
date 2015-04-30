@@ -1,3 +1,4 @@
+Attention: When using MOD value as hash function, it is not proper to think the same hash value represents the same key value, because, for example, MOD = 5, key1 = 2 and key2 = 7, hash_value(key1) == hash_value(key2), but key1 != key2, which we should keep in mind all the time programming.
 （一）以下是个人解决方案，使用哈希表存储a+b的值，哈希函数使用取模（模通常为比较大的素数，防止太多冲突）运算，由于有的和可能为负，因此使用((key%MOD) + MOD) % MOD计算，保证全为正数，使用链地址法存储哈希表。
 枚举所有哈希表中的值，枚举C中的一个，找D中有多少个与要求的值相等，d=-a-b-c，即为个数。
 但这种方法运算超时，因此改进时需要将c+d也用哈希表存储，然后两个哈希表进行比较。大于n*nlogn
