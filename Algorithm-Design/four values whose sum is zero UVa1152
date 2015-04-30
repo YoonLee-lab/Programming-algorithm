@@ -1,4 +1,4 @@
-以下是个人解决方案，使用哈希表存储a+b的值，哈希函数使用取模（模通常为比较大的素数，防止太多冲突）运算，由于有的和可能为负，因此使用((key%MOD) + MOD) % MOD计算，保证全为正数，使用链地址法存储哈希表。
+（一）以下是个人解决方案，使用哈希表存储a+b的值，哈希函数使用取模（模通常为比较大的素数，防止太多冲突）运算，由于有的和可能为负，因此使用((key%MOD) + MOD) % MOD计算，保证全为正数，使用链地址法存储哈希表。
 枚举所有哈希表中的值，枚举C中的一个，找D中有多少个与要求的值相等，d=-a-b-c，即为个数。
 但这种方法运算超时，因此改进时需要将c+d也用哈希表存储，然后两个哈希表进行比较。
 #include <cstdio>
@@ -94,3 +94,129 @@ int main() {
     }
     return 0;
 }
+
+（二）
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 4000 + 10;
+const int MOD = 1e5 + 7;
+int N;
+int A[maxn], B[maxn], C[maxn], D[maxn];
+struct node {
+    int value;
+    node *next;
+}h_table[MOD], h_table2[MOD]; // head
+
+node *new_node() {
+    node *a = new node;
+    a->next = NULL;
+    return a;
+}
+
+int h(int key) { // negative value in case
+    return ((key%MOD) + MOD) % MOD;
+}
+
+void del_node(node *table, int n) {
+    for(int i = 0; i < n; i++) {
+        if(table[i].next) {
+            node *p = table[i].next;
+            node *d = NULL;
+            while(p) {
+                d = p;
+                p = p->next;
+                delete(d);
+            }
+        }
+        table[i].next = NULL;
+    }
+}
+
+// lbound and ubound return [x1, x2) indicating position of v in D
+// including left and excluding right interval region
+int lbound(int *D, int x, int y, int v) {
+    int m;
+    while(x < y) {
+        m = x + (y-x)/2;
+        if(D[m] >= v) y = m;
+        else x = m + 1;
+    }
+    return x;
+}
+int ubound(int *D, int x, int y, int v) {
+    int m;
+    while(x < y) {
+        m = x + (y-x)/2;
+        if(D[m] <= v) x = m + 1;
+        else y = m;
+    }
+    return x;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while(T--) {
+        //memset(h_table, 0, sizeof(h_table));
+        //memset(h_table2, 0, sizeof(h_table2));
+        scanf("%d", &N);
+        for(int i = 0; i < N; i++)
+            scanf("%d%d%d%d", &A[i], &B[i], &C[i], &D[i]);
+        for(int i = 0; i < N; i++) // establish hash table for a+b
+            for(int j = 0; j < N; j++) {
+                int t = A[i] + B[j];
+                node *a = new_node();
+                a->value = t;
+                if(!h_table[h(t)].next)
+                    h_table[h(t)].next = a;
+                else {
+                    node *p = h_table[h(t)].next;
+                    while(p->next) p = p->next;
+                    p->next = a;
+                }
+                //printf("%d  ", h(t));
+            }
+        
+        for(int i = 0; i < N; i++) // establish hash table for -(c+d)
+            for(int j = 0; j < N; j++) {
+                int t = -(C[i] + D[j]);
+                node *a = new_node();
+                a->value = t;
+                if(!h_table2[h(t)].next)
+                    h_table2[h(t)].next = a;
+                else {
+                    node *p = h_table2[h(t)].next;
+                    while(p->next) p = p->next;
+                    p->next = a;
+                }
+                //printf("%d  ", h(t));
+            }
+        //printf("\n");
+        // count
+        int cnt = 0;
+        for(int i = 0; i < MOD; i++) {
+            if(h_table[i].next && h_table2[i].next) {
+                node *p1 = h_table[i].next;
+                node *p2 = h_table[i].next;
+                while(p1) {
+                    while(p2) {
+                        if(p1->value == p2->value)
+                            cnt++;
+                        p2 = p2->next;
+                    }
+                    p1 = p1->next;
+                }
+            }
+            //    cnt += (h_table[i]*h_table2[i]);
+        }
+        printf("%d\n", cnt);
+        if(T) printf("\n");
+        del_node(h_table, N);
+        del_node(h_table2, N);
+    }
+    return 0;
+}
+
+（三）
