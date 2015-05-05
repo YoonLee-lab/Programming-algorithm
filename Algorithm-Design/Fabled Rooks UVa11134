@@ -1,0 +1,38 @@
+Time Limited Exceeded: 回溯法，范围5000来说太大，很容易超时，解答数太大，容易超时。
+#include <cstdio>
+#include <cstring>
+const int maxn = 5000 + 10;
+int xl[maxn], xr[maxn], yl[maxn], yr[maxn];
+int ansx[maxn], ansy[maxn], vis[maxn];
+int N, ok = 0;
+void dfs(int cur, int *l, int *r, int *ans) {
+	if(cur == N) {
+		ok = 1;
+		return;
+	}
+	for(int i = l[cur]; i <= r[cur]; i++) {
+		if(vis[i]) continue;
+		ans[cur] = i;
+		vis[i] = 1;
+		dfs(cur+1, l, r, ans);
+		if(ok) return;
+		vis[i] = 0;
+	}
+}
+int main() {
+	while(scanf("%d", &N) != EOF && N) {
+		ok = 0;
+		for(int i = 0; i < N; i++)
+			scanf("%d%d%d%d", &xl[i], &yl[i], &xr[i], &yr[i]);
+		memset(vis, 0, sizeof(vis));
+		dfs(0, xl, xr, ansx);
+		memset(vis, 0, sizeof(vis));
+		dfs(0, yl, yr, ansy);
+		if(ok) {
+			for(int i = 0; i < N; i++)
+				printf("%d %d\n", ansx[i], ansy[i]);
+		}else
+			printf("IMPOSSIBLE\n");
+	}
+	return 0;
+}
