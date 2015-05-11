@@ -36,3 +36,81 @@ int main() {
 	}
 	return 0;
 }
+
+分解问题+贪心法：将每个区间按y值从小到大排序，y相同的区间按x从小到大排序，然后对这些区间从左到右依次填数，这样确保了给后边要填的格子留下了最大的空间，因为每次y值的选择是最小的。由于这些区间必须填一个数，因此遍历这些区间，对当前区间的每一个位置进行尝试（设置一个访问数组）。
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 5000 + 10;
+int N, ok = 0;
+int vis[maxn];
+struct Node {
+	int id, xl, xr, yl, yr;
+	int ansx, ansy;
+}rook[maxn];
+bool cmp_x(Node &a, Node &b) {
+	if(a.xr != b.xr)
+		return a.xr < b.xr;
+	return a.xl < b.xl;
+}
+bool cmp_y(Node &a, Node &b) {
+	if(a.yr != b.yr)
+		return a.yr < b.yr;
+	return a.yl < b.yl;
+}
+bool cmp_id(Node &a, Node &b) {
+	return a.id < b.id;
+}
+int main() {
+	while(scanf("%d", &N) != EOF && N) {
+		ok = 1;
+		for(int i = 0; i < N; i++) {
+			scanf("%d%d%d%d", &rook[i].xl, &rook[i].yl, &rook[i].xr, &rook[i].yr);
+			rook[i].id = i;
+		}
+		memset(vis, 0, sizeof(vis));
+		// check x axis
+		sort(rook, rook+N, cmp_x);
+		int cur = 0;
+		while(cur != N) {
+			for(int i = rook[cur].xl; i <= rook[cur].xr; i++) {
+				if(vis[i]) continue;
+				vis[i] = 1;
+				rook[cur].ansx = i;
+				break;
+			}
+			cur++;
+		}
+		int sum = 0;
+		for(int i = 1; i <= N; i++)
+			sum += vis[i];
+		if(sum < N) ok = 0;
+		if(ok == 1) {
+			cur = 0;
+			memset(vis, 0, sizeof(vis));
+			// check y axis
+			sort(rook, rook+N, cmp_y);
+			while(cur != N) {
+				for(int i = rook[cur].yl; i <= rook[cur].yr; i++) {
+					if(vis[i]) continue;
+					vis[i] = 1;
+					rook[cur].ansy = i;
+					break;
+				}
+				cur++;
+			}
+			sum = 0;
+			for(int i = 1; i <= N; i++)
+				sum += vis[i];
+			if(sum < N) ok = 0;
+		}
+		if(ok) {
+			sort(rook, rook+N, cmp_id);
+			for(int i = 0; i < N; i++)
+				printf("%d %d\n", rook[i].ansx, rook[i].ansy);
+		}else
+			printf("IMPOSSIBLE\n");
+	}
+	return 0;
+}
