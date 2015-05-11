@@ -86,7 +86,7 @@ int main() {
 		for(int i = 1; i <= N; i++)
 			sum += vis[i];
 		if(sum < N) ok = 0;
-		if(ok == 1) {
+		if(ok == 1) { // Accidentally write 'ok = 1', which takes me 4 days to debug
 			cur = 0;
 			memset(vis, 0, sizeof(vis));
 			// check y axis
