@@ -50,6 +50,8 @@ Case #2:
 由于IP定义为结构体，在使用set时需要重载<运算符，<在结构体中定义，不加const报错，表示不会修改类的成员变量。
 STL对<要求严格，必须能够根据<推出>和==，注释掉的那部分行不通。
 
+更好的办法：ip存为uint32类型，直接比较uint32类型的大小就可以判断是否重复。
+
 #include <cstdio>
 #include <cstring>
 #include <string>
